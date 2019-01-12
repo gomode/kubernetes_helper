@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -o errexit
 echo "——————————————————————————清时输入相关配置——————————————————————————"
 read -p "请输入想要安装的k8s版本(1.13.1):"  config_k8s_version
 if [ -z "${config_k8s_version}" ];then
@@ -48,7 +49,7 @@ done
 
 echo "——————————————————————————开始启动kubernetes——————————————————————————"
 sed "s/k8s.customer-domain.com/${config_k8s_domain}/" kubeadm.yaml > kubeadm_config.yaml
-sed -i "s/CONFIG_KUBERNETES_VERSION/v${k8s_version}/" kubeadm_config.yaml
+sed -i "s/CONFIG_KUBERNETES_VERSION/${k8s_version}/" kubeadm_config.yaml
 
 kubeadm init --config=./kubeadm_config.yaml
 rm -rf $HOME/.kube
