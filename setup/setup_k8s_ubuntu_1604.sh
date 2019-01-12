@@ -24,7 +24,7 @@ cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
 deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
 EOF
 apt-get update
-apt-get install -y kubelet=v${config_k8s_version} kubeadm=v${config_k8s_version} kubectl=v${config_k8s_version}
+apt-get install -y kubelet=${config_k8s_version}-00 kubeadm=${config_k8s_version}-00 kubectl=${config_k8s_version}-00
 apt-mark hold kubelet kubeadm kubectl
 
 
