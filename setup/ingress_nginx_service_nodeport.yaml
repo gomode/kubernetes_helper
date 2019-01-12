@@ -1,0 +1,25 @@
+#通过NodePort模式来暴露Nginx-ingress的服务
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-nginx
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    nodePort: 80
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  - name: https
+    nodePort: 443
+    port: 443
+    targetPort: 443
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx

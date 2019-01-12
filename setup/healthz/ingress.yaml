@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/service-weight: ""
+  name: healthz
+  namespace: default
+spec:
+  rules:
+  - host: api2.dream623.com
+    http:
+      paths:
+      - backend:
+          serviceName: healthz
+          servicePort: 80
+        path: /healthz
+#  tls:
+#  - hosts:
+#    - api.dream623.com
+#    secretName: minp-be-secret0

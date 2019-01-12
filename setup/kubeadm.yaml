@@ -1,0 +1,44 @@
+# 具体有哪些配置参数去参考 https://github.com/ReSearchITEng/kubeadm-playbook/tree/master/group_vars/all
+apiVersion: kubeadm.k8s.io/v1alpha3
+kind: InitConfiguration
+nodeRegistration:
+  # name: "cn-hangzhou.i-bp19gwtfsmjdwt2gldd7"
+  kubeletExtraArgs: # 最终kubectl启用时候会带的参数列表
+    # cloud-provider: "external"
+    # hostname-override: "cn-hangzhou.i-bp19gwtfsmjdwt2gldd7" # 阿里云适配
+    # provider-id: "cn-hangzhou.i-bp19gwtfsmjdwt2gldd7" # 阿里云适配
+    fail-swap-on: "true" # 一般都是需要关闭使用swap，开启此选项后，若swap没关闭则失败并警告
+    # cgroup-driver: "cgroupfs" # systemd 前者不行的时候用后者
+---
+apiVersion: kubeadm.k8s.io/v1alpha3
+kind: ClusterConfiguration
+# clusterName: "kubernetes" # 一般无需改变
+# imageRepository: "registry-vpc.cn-hangzhou.aliyuncs.com/google_containers" # 为了使用阿里云镜像加速，但后续发现v1.12.2会有问题，请手动先执行pull_images.sh
+networking:
+#  dnsDomain: "k8s" # 不使用默认的 cluster.local
+  podSubnet: "192.168.0.0/16" # 这个地址是 calico 的默认网段，注意不能和阿里云VPC网段重合
+  serviceSubnet: "10.96.0.0/12" # 注意不能和阿里云VPC网段重合
+kubernetesVersion: "CONFIG_KUBERNETES_VERSION"
+apiServerExtraArgs:
+  # cloud-provider: external # 为了适配阿里云
+  service-node-port-range: 80-32767 # 开放更多端口使用
+controllerManagerExtraArgs:
+# cloud-provider: external # 为了适配阿里云
+# horizontal-pod-autoscaler-use-rest-clients: "false" # 阿里云例子里的
+apiServerCertSANs: # 一般是本机IP，私有IP，外网IP或者域，所有MasterIP或主机名，所有EctdIP 和 其它你可能需要通过它访问apiserver的IP或者域名或者主机名等，证书中会允许这些地址访问
+- "127.0.0.1" # 本机IP
+- "k8s.customer-domain.com" # 为了 .kube/config 外网访问
+# - "master1" # 如果要多master，那就把所有master的节点地址都要挨个给到
+# - "master2"
+# - "master3"
+# - "etcd1" # 如果要自己给予etcd的话，就把ectd的几个节点地址都要挨个给到
+# - "etcd2"
+# - "etcd3"
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+# mode: "ipvs" # 标记使用ipvs，但是貌似和drone使用的dind有冲突
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+# resolvConf: /etc/resolv_k8s.conf # 单独用一个吧，内部需修改ns为114.114.114.114，防止循环DNS问题，若修改原resolv.conf可能会影响aliyun mirrors的访问。但是后面发现 kubectl edit configmaps coredns -n kube-system 里不会使用这个值，所以也解决不了循环DNS问题，需要在后续处理。
