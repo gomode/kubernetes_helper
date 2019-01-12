@@ -47,8 +47,8 @@ do
 done
 
 echo "——————————————————————————开始启动kubernetes——————————————————————————"
-sed -i "s/k8s.customer-domain.com/${config_k8s_domain}" kubeadm.yaml
-sed -i "s/CONFIG_KUBERNETES_VERSION/v${k8s_version}" kubeadm.yaml
+sed "s/k8s.customer-domain.com/${config_k8s_domain}/" kubeadm.yaml > kubeadm_config.yaml
+sed -i "s/CONFIG_KUBERNETES_VERSION/v${k8s_version}/" kubeadm_config.yaml
 
 kubeadm init --config=./kubeadm.yaml
 rm -rf $HOME/.kube
