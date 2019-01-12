@@ -50,7 +50,7 @@ echo "————————————————————————�
 sed "s/k8s.customer-domain.com/${config_k8s_domain}/" kubeadm.yaml > kubeadm_config.yaml
 sed -i "s/CONFIG_KUBERNETES_VERSION/v${k8s_version}/" kubeadm_config.yaml
 
-kubeadm init --config=./kubeadm.yaml
+kubeadm init --config=./kubeadm_config.yaml
 rm -rf $HOME/.kube
 mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
