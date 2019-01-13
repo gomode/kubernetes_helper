@@ -16,6 +16,11 @@ if [ -z "${config_api_domain}" ];then
   echo "请输入访问集群测试API接口的域名"
 fi
 
+hasQuayIO=`cat /etc/hosts | grep quay.io | wc -l`
+if [ ${hasQuayIO} -eq 0 ];then
+    echo "quay-mirror.qiniu.com quay.io" >> /etc/hosts
+fi
+
 apt-get update -y && apt-get upgrade -y 
 swapoff -a
 echo "——————————————————————————开始安装docker——————————————————————————"
@@ -69,9 +74,9 @@ kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/
 kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
 
 isReady=`kubectl get pods --namespace=kube-system  | grep calico | awk '{print $3}'`
-while [ "${isReady}"x -ne "Running"x ];do
+while [ "${isReady}" != "Running" ];do
     echo "等待calico服务启动中"
-    sleep 1
+    sleep 10
     isReady=`kubectl get node | grep "master" | awk '{print $2}'`
 done
 
@@ -90,4 +95,10 @@ kubectl apply -f ./healthz/service.yaml
 sed "s/CONFIG_API_DOMAIN/${config_api_domain}/" ./healthz/ingress.yaml > ./healthz/ingress_config.yaml
 kubectl apply -f ./healthz/ingress_config.yaml
 
+isReady=`kubectl get pods --namespace=ingress-nginx  | grep nginx-ingress-controller | awk '{print $3}'`
+while [ "${isReady}" != "Running" ];do
+    echo "等待nginx-ingress服务启动中"
+    sleep 10
+    isReady=`kubectl get node | grep "master" | awk '{print $2}'`
+done
 echo "——————————————————————————安装完毕——————————————————————————"
