@@ -70,9 +70,8 @@ chown $(id -u):$(id -g) $HOME/.kube/config
 echo "———————————————————kubernetes安装完毕，安装calico——————————————————"
 
 echo "——————————————————————————开始安装calico——————————————————————————"
-kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
-kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
-
+kubectl apply -f ./calico/rbac-kdd.yaml
+kubectl apply -f ./calico/calico.yaml
 isReady=`kubectl get pods --namespace=kube-system  | grep calico | awk '{print $3}'`
 while [ "${isReady}" != "Running" ];do
     echo "等待calico服务启动中"
@@ -85,7 +84,7 @@ kubectl taint nodes --all node-role.kubernetes.io/master-
 
 echo "——————————————————————————开始安装ingress-nginx—————————————————————————"
 #安装nginx-ingres
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml
+kubectl apply -f ./ingress_nginx_mandatory.yaml
 #启动nginx-ingres 服务，使用的是NodePort的模式
 kubectl apply -f ./ingress_nginx_service_nodeport.yaml
 
