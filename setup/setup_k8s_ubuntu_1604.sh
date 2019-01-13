@@ -99,6 +99,6 @@ isReady=`kubectl get pods --namespace=ingress-nginx  | grep nginx-ingress-contro
 while [ "${isReady}" != "Running" ];do
     echo "等待nginx-ingress服务启动中"
     sleep 10
-    isReady=`kubectl get node | grep "master" | awk '{print $2}'`
+    isReady=`kubectl get pods --namespace=ingress-nginx  | grep nginx-ingress-controller | awk '{print $3}'`
 done
 echo "——————————————————————————安装完毕——————————————————————————"
