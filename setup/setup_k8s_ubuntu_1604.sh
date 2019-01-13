@@ -62,12 +62,18 @@ mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 chown $(id -u):$(id -g) $HOME/.kube/config
 # 配置kubectl 自动提示
-echo "———————————————————kubernetes安装完毕，30s后安装calico——————————————————"
+echo "———————————————————kubernetes安装完毕，安装calico——————————————————"
 
-sleep 30s
 echo "——————————————————————————开始安装calico——————————————————————————"
 kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
 kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
+
+isReady=`kubectl get pods --namespace=kube-system  | grep calico | awk '{print $3}'`
+while [ "${isReady}"x -ne "Running"x ];do
+    echo "等待calico服务启动中"
+    sleep 1
+    isReady=`kubectl get node | grep "master" | awk '{print $2}'`
+done
 
 # 允许master接受调度
 kubectl taint nodes --all node-role.kubernetes.io/master-

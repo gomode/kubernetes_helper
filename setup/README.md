@@ -42,3 +42,8 @@ echo "set fileencodings=utf-8,gbk,utf-16le,cp1252,iso-8859-15,ucs-bom" >> /etc/v
 echo "set set termencoding=utf-8" >> /etc/vim/vimrc
 echo "set set encoding=utf-8" >> /etc/vim/vimrc
 ```
+
+
+```
+source <(kubectl completion bash)
+```
