@@ -7,7 +7,7 @@ metadata:
   namespace: default
 spec:
   rules:
-  - host: api2.dream623.com
+  - host: CONFIG_API_DOMAIN
     http:
       paths:
       - backend:

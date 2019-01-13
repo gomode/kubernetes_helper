@@ -11,6 +11,11 @@ if [ -z "${config_k8s_domain}" ];then
   echo "您没有输入外部访问的域名/公网地址，只能通过本机访问"
 fi
 
+read -p "请输入访问集群测试API接口的域名,类似api.xxx.com:"  config_api_domain
+if [ -z "${config_api_domain}" ];then
+  echo "请输入访问集群测试API接口的域名"
+fi
+
 apt-get update -y && apt-get upgrade -y 
 swapoff -a
 echo "——————————————————————————开始安装docker——————————————————————————"
@@ -57,11 +62,9 @@ mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 chown $(id -u):$(id -g) $HOME/.kube/config
 # 配置kubectl 自动提示
-echo "source <(kubectl completion bash)" >> ~/.bashrc
-source <(kubectl completion bash)
-echo "———————————————————kubernetes安装完毕，10s后安装calico——————————————————"
+echo "———————————————————kubernetes安装完毕，30s后安装calico——————————————————"
 
-sleep 10s
+sleep 30s
 echo "——————————————————————————开始安装calico——————————————————————————"
 kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
 kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
@@ -69,9 +72,16 @@ kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/
 # 允许master接受调度
 kubectl taint nodes --all node-role.kubernetes.io/master-
 
-kubectl apply -f ./healthz/ingress_nginx_service_nodeport.yaml
-
+echo "——————————————————————————开始安装ingress-nginx—————————————————————————"
 #安装nginx-ingres
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml
 #启动nginx-ingres 服务，使用的是NodePort的模式
 kubectl apply -f ./ingress_nginx_service_nodeport.yaml
+
+echo "——————————————————————————开始启动healthz服务——————————————————————————"
+kubectl apply -f ./healthz/deployment.yaml
+kubectl apply -f ./healthz/service.yaml
+sed "s/CONFIG_API_DOMAIN/${config_api_domain}/" ./healthz/ingress.yaml > ./healthz/ingress_config.yaml
+kubectl apply -f ./healthz/ingress_config.yaml
+
+echo "——————————————————————————安装完毕——————————————————————————"
