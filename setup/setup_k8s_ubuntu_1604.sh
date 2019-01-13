@@ -77,7 +77,7 @@ isReady=`kubectl get pods --namespace=kube-system  | grep calico | awk '{print $
 while [ "${isReady}" != "Running" ];do
     echo "等待calico服务启动中"
     sleep 10
-    isReady=`kubectl get node | grep "master" | awk '{print $2}'`
+    isReady=`kubectl get pods --namespace=kube-system  | grep calico | awk '{print $3}'`
 done
 
 # 允许master接受调度
