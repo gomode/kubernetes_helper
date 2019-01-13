@@ -2,12 +2,16 @@
 
 安装kubernetes的脚本
 
-# 单机安装
-## Ubuntu16.04安装
+## Ubuntu16.04 单机安装 安装
 操作系统:Ubuntu16.04
 硬件配置:2核4GB阿里云ECS
 权限: root
 ### 安装步骤
+0. 准备环境
+    + 准备一台Ubuntu16.04 机器，比如阿里云ECS 2核心8GB的机器，需要又公网IP
+    + 配置一个kubectl访问集群用的域名，例如 k8s.xxxx.com,域名指向机器的公网IP
+    + 配置一个API访问的域名，例如 api.xxxx.com,域名指向机器的公网IP
+    + 确保机器的80,6443端口可以访问(阿里云机器的话需要配置安全组)
 1. 安装git,下载本代码仓库
 ```
 apt-get update -y && apt-get upgrade -y && apt install git
@@ -28,6 +32,11 @@ cd kubernetes_helper/setup/
       - 这个域名通常配置为整个后端的接口域名
       - 整个脚本执行完成以后可以通过域名/healthz来测试，成功的话返回ok。
 
+1. 从公网使用kubectl访问集群(可选)
+   + 本地安装好kubectl (具体安装文档:https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+   + 把集群服务器的~/.kube/config 下面的文件拷贝到本地的 ~/.kube/config 位置
+   + 修改server 这个参数里面的私有地址替换为一开始准备好的域名(k8s.xxxx.com)
+   + kubectl get node 查看一下
 
 # 问题排查
 
@@ -36,14 +45,14 @@ cd kubernetes_helper/setup/
 journalctl -f -u kubelet
 ```
 
-
+1. 解决vim中文乱码问题
 ```
 echo "set fileencodings=utf-8,gbk,utf-16le,cp1252,iso-8859-15,ucs-bom" >> /etc/vim/vimrc
 echo "set set termencoding=utf-8" >> /etc/vim/vimrc
 echo "set set encoding=utf-8" >> /etc/vim/vimrc
 ```
 
-
+1. kubectl 命令行自动提示
 ```
 source <(kubectl completion bash)
 ```
