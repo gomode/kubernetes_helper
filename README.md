@@ -2,7 +2,7 @@
 
 安装kubernetes的脚本
 
-## Ubuntu16.04 单机安装 安装
+## Ubuntu16.04 单机安装 安装 (无需翻墙)
 + 操作系统:Ubuntu16.04
 + 硬件配置:2核4GB阿里云ECS
 + 权限: root
